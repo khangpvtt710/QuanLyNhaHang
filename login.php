@@ -67,29 +67,39 @@ if (isset($_POST['login'])) {
     } else {
 
         // Escape chống SQL Injection
-        
+        $username = $db->escape($username);
 
         $sql = "SELECT * FROM tbl_user WHERE username = '$username' LIMIT 1";
         $result = $db->select($sql);
 
         if ($result) {
+
             $user = $result->fetch_assoc();
 
-            // So sánh mật khẩu hash
+            // ✅ GÁN HASH Ở ĐÂY (QUAN TRỌNG)
+            $hash = $user['password'];
+
+            // So sánh mật khẩu
             if (password_verify($password, $hash)) {
 
-    $_SESSION['user_login'] = $user['username']; // 👈 THÊM DÒNG NÀY
+                // ✅ LƯU SESSION
+                $_SESSION['user_login'] = $user['username'];
 
-    if ($user['username'] === "admin") {
-        echo "<script>alert('Đăng nhập Admin thành công!');
-              window.location='cartegoryadd.php';</script>";
-        exit;
-    }
+                if ($user['username'] === "admin") {
+                    echo "<script>
+                        alert('Đăng nhập Admin thành công!');
+                        window.location='cartegoryadd.php';
+                    </script>";
+                    exit;
+                }
 
-    echo "<script>alert('Đăng nhập thành công!');
-          window.location='index.php';</script>";
-    exit;
-    } else {
+                echo "<script>
+                    alert('Đăng nhập thành công!');
+                    window.location='index.php';
+                </script>";
+                exit;
+
+            } else {
                 echo "<div class='error'>Sai mật khẩu!</div>";
             }
 

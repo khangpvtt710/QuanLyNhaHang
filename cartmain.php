@@ -1,134 +1,174 @@
 <?php
-include "headermain.php"
+include "headermain.php";
+
+// Tạo giỏ hàng nếu chưa có
+if (!isset($_SESSION['cart'])) {
+    $_SESSION['cart'] = [];
+}
+
+/* ===============================
+   1. THÊM SẢN PHẨM VÀO GIỎ HÀNG
+=================================*/
+if (isset($_POST['add_to_cart'])) {
+
+    $id = $_POST['product_id'];
+
+    // Nếu sản phẩm đã tồn tại -> tăng số lượng
+    if (isset($_SESSION['cart'][$id])) {
+        $_SESSION['cart'][$id]['quantity'] += $_POST['quantity'];
+    } 
+    // Nếu sản phẩm chưa tồn tại -> thêm mới
+    else {
+        $_SESSION['cart'][$id] = [
+            'name' => $_POST['product_name'],
+            'price' => $_POST['product_price'],
+            'img' => $_POST['product_img'],
+            'quantity' => $_POST['quantity']
+        ];
+    }
+
+    echo "<script>window.location='cartmain.php'</script>";
+    exit;
+
+}
+
+/* ===============================
+   2. XÓA SẢN PHẨM KHỎI GIỎ
+=================================*/
+if (isset($_GET['remove'])) {
+    unset($_SESSION['cart'][$_GET['remove']]);
+    header("Location: cartmain.php");
+    exit;
+}
+
+/* ===============================
+   3. CẬP NHẬT SỐ LƯỢNG
+=================================*/
+if (isset($_POST['update_cart'])) {
+
+    foreach ($_POST['qty'] as $id => $quantity) {
+
+        if ($quantity <= 0) {
+            unset($_SESSION['cart'][$id]);
+        } else {
+            $_SESSION['cart'][$id]['quantity'] = $quantity;
+        }
+    }
+
+    header("Location: cartmain.php");
+    exit;
+}
 ?>
 
-<!-----------------------------------cart---------------------------------------->
+<!----------------------------------- CART UI ---------------------------------------->
 <section class="cart brick">
     <div class="container">
         <div class="cart-top-swap">
             <div class="cart-top">
                 <div class="cart-top-cart card-top-item">
-                    <a href="cartmain.php"><i class="fas fa-shopping-cart "></i></a>
+                    <i class="fas fa-shopping-cart"></i>
                 </div>
                 <div class="cart-top-adress card-top-item">
                     <a href="deliverymain.php"><i class="fas fa-map-marker-alt"></i></a>
                 </div>
                 <div class="cart-top-payment card-top-item">
-                    <a href="paymentmain.php"><i class="fas fa-money-check-alt "></i></a>
+                    <a href="paymentmain.php"><i class="fas fa-money-check-alt"></i></a>
                 </div>
             </div>
         </div>
     </div>
+
     <div class="container">
-        <div class="cart-content row">
-            <div class="cart-content-left">
-                <table>
-                    <tr>
-                        <th>Sản Phẩm</th>
-                        <th>Tên Sản Phẩm</th>
-                        <th>Màu</th>
-                        <th>Size</th>
-                        <th>Số Lượng</th>
-                        <th>Thành Tiền</th>
-                        <th>Xóa</th>
-                    </tr>
-                    <tr>
-                        <td>
-                            <img src="imgR/Ram PC Kingston Fury Beast 8GB DDR4 3200Mhz 490k.webp" alt="">
-                        </td>
-                        <td>
-                            <p>Ram PC Kingston Fury Beast 8GB DDR4 3200Mhz</p>
-                        </td>
-                        <td>
-                            <img src="img-color/black.jpg" alt="">
-                        </td>
-                        <td>
-                            <p>8G</p>
-                        </td>
-                        <td>
-                            <input type="number" value="1" min="1">
-                        </td>
-                        <td>
-                            <p>490.000 <sup>đ</sup></p>
-                        </td>
-                        <td>
-                            <span>X</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <img src="imgR/Ram 4 16G Bus 3200 Corsair Ddr4 Vengeance Lpx Black Heat Spreader 720k.webp"
-                                alt="">
-                        </td>
-                        <td>
-                            <p>Ram 4 16G Bus 3200 Corsair Ddr4 Vengeance Lpx Black Heat Spreader</p>
-                        </td>
-                        <td>
-                            <img src="img-color/black.jpg" alt="">
-                        </td>
-                        <td>
-                            <p>16G</p>
-                        </td>
-                        <td>
-                            <input type="number" value="1" min="1">
-                        </td>
-                        <td>
-                            <p>720.000 <sup>đ</sup></p>
-                        </td>
-                        <td>
-                            <span>X</span>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            <div class="cart-content-right">
-                <table>
-                    <tr>
-                        <th colspan="2">Tổng Tiền Giỏ Hàng</th>
-                    </tr>
-                    <tr>
-                        <td>Tổng Sản Phẩm</td>
-                        <td>2</td>
-                    </tr>
-                    <tr>
-                        <td>Tổng Tiền Hàng</td>
-                        <td>
-                            <p>490.000 <sup>đ</sup></p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Tạm Tính</td>
-                        <td style="color: black; font-weight: bold;">
-                            <p>490.000 <sup>đ</sup></p>
-                        </td>
-                    </tr>
-                </table>
-                <div class="cart-content-right-text">
-                    <p>Giảm 30.000đ phí vận chuyển cho đơn hàng có giá trị từ 500.000đ</p>
-                    <p style="color: red; font-weight: bold;"> Giảm <span style="font-size: 18px;">50.000đ</span>
-                        phí vận chuyển cho đơn hàng PC (máy bộ) dưới 10.000.000đ</p>
+        <form method="POST">
+
+            <div class="cart-content row">
+                <div class="cart-content-left">
+                    <table>
+                        <tr>
+                            <th>Ảnh</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Giá</th>
+                            <th>Số lượng</th>
+                            <th>Thành tiền</th>
+                            <th>Xóa</th>
+                        </tr>
+
+                        <?php
+                        $total = 0;
+
+                        if (!empty($_SESSION['cart'])) {
+
+                            foreach ($_SESSION['cart'] as $id => $item) {
+
+                                $subtotal = $item['price'] * $item['quantity'];
+                                $total += $subtotal;
+                        ?>
+                        <tr>
+                            <td><img src="uploads/<?= $item['img'] ?>" width="90"></td>
+
+                            <td><?= $item['name'] ?></td>
+
+                            <td><?= number_format($item['price']) ?> đ</td>
+
+                            <td>
+                                <input type="number" min="1" name="qty[<?= $id ?>]" value="<?= $item['quantity'] ?>">
+                            </td>
+
+                            <td><?= number_format($subtotal) ?> đ</td>
+
+                            <td>
+                                <a href="cartmain.php?remove=<?= $id ?>" style="color:red;font-weight:bold;">X</a>
+                            </td>
+                        </tr>
+                        <?php
+                            }
+                        } else {
+                            echo "<tr><td colspan='6' style='text-align:center;'>🛒 Giỏ hàng trống</td></tr>";
+                        }
+                        ?>
+                    </table>
+
+                    <button style="margin-top:10px;" type="submit" name="update_cart">
+                        Cập nhật giỏ hàng
+                    </button>
                 </div>
-                <div class="cart-content-right-button">
-                    <button><a href="cartegorymain.php">Tiếp Tục Mua</a></button>
-                    <button> <a href="deliverymain.php">Thanh Toán</a></button>
-                </div>
-                <div class="cart-content-right-dangnhap">
-                    <p>Tài Khoản Google</p> <br>
-                    <p>Hãy <a href="">đăng nhập</a> để tích điểm thành viên</p>
+
+                <div class="cart-content-right">
+                    <table>
+                        <tr>
+                            <th colspan="2">Tổng tiền giỏ hàng</th>
+                        </tr>
+
+                        <tr>
+                            <td>Tổng sản phẩm</td>
+                            <td><?= isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0 ?></td>
+                        </tr>
+
+                        <tr>
+                            <td>Tổng tiền hàng</td>
+                            <td><?= number_format($total) ?> đ</td>
+                        </tr>
+
+                        <tr>
+                            <td>Tạm tính</td>
+                            <td style="font-weight:bold;color:black;">
+                                <?= number_format($total) ?> đ
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="cart-content-right-button">
+                        <button><a href="cartegorymain.php">Tiếp tục mua hàng</a></button>
+
+                        <?php if ($total > 0): ?>
+                        <button><a href="deliverymain.php">Thanh toán</a></button>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
-        </div>
+
+        </form>
     </div>
 </section>
 
-
-
-
-<!-----------------------------------footer---------------------------------------->
-<?php
-include "footermain.php"
-?>
-</body>
-<script src="js/index.js"></script>
-
-</html>
+<?php include "footermain.php"; ?>

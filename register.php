@@ -30,23 +30,22 @@ $db = new Database();
 .register-box button {
     width: 100%;
     padding: 12px;
-    background: #28a745;
+    margin-top: 10px;
     border: none;
-    color: #fff;
-    font-size: 16px;
     border-radius: 5px;
+    background: #ff8400ff;
+    color: white;
     cursor: pointer;
-}
 
-.register-box .error {
-    color: red;
-    text-align: center;
-}
+    .register-box .error {
+        color: red;
+        text-align: center;
+    }
 
-.register-box .success {
-    color: green;
-    text-align: center;
-}
+    .register-box .success {
+        color: green;
+        text-align: center;
+    }
 </style>
 
 <?php
@@ -96,5 +95,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <input type="password" name="password" placeholder="Mật khẩu" required>
 
         <button type="submit">Đăng ký</button>
+        <button style="" onclick="window.location.href='login.php'">Đăng nhập </button>
     </form>
 </div>

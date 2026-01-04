@@ -4,30 +4,34 @@ include "class/product-class.php";
 
 $product = new productclass();
 
-// Breadcrumb mặc định
+// kiểm tra có cartegory_id hoặc brand_id hay không
 $breadcrumb = "Tất cả sản phẩm";
-
 $get_products = null;
 
-// Nếu lọc theo brand
+// lọc theo brand
 if (isset($_GET['brand_id'])) {
     $brand_id = $_GET['brand_id'];
     $get_products = $product->get_product_by_brand($brand_id);
 
-    // Lấy tên thương hiệu
     $brand = $product->get_brand_name($brand_id);
     $breadcrumb = $brand ? $brand['brand_name'] : "Thương hiệu";
+}
 
-// Nếu lọc theo category
-} elseif (isset($_GET['cartegory_id'])) {
+// lọc theo category
+elseif (isset($_GET['cartegory_id'])) {
     $cartegory_id = $_GET['cartegory_id'];
     $get_products = $product->get_product_by_cartegory($cartegory_id);
 
-    // Lấy tên danh mục
     $category = $product->get_cartegory_name($cartegory_id);
     $breadcrumb = $category ? $category['cartegory_name'] : "Danh mục";
 }
+
+// nếu không có gì
+else{
+    echo "<h3>Không có danh mục hoặc thương hiệu hợp lệ</h3>";
+}
 ?>
+
 
 <?php
 require_once "class/product-class.php";
@@ -147,24 +151,31 @@ $brands = $product->show_brand();
                 </div>
 
                 <div class="cartegory-right-content">
-                    <?php 
-                    if ($get_products) {
-                        while ($row = $get_products->fetch_assoc()) {
-                    ?>
-                    <a href="productmain.php?product_id=<?= $row['product_id'] ?>">
-                        <div class="cartegory-right-contant-item">
+
+                    <?php
+if ($get_products) {
+
+    while($row = $get_products->fetch_assoc()){
+?>
+
+                    <div class="cartegory-right-contant-item">
+                        <a href="productmain.php?product_id=<?= $row['product_id'] ?>">
                             <img src="uploads/<?= $row['product_img'] ?>" alt="">
                             <h1><?= $row['product_name'] ?></h1>
                             <p><?= number_format($row['product_price_new']) ?><sup>đ</sup></p>
-                        </div>
-                    </a>
-                    <?php 
-                        }
-                    } else {
-                        echo "<p>Không tìm thấy sản phẩm nào!</p>";
-                    }
-                    ?>
+                        </a>
+                    </div>
+
+                    <?php
+    }
+
+} else {
+    echo "<p>Không tìm thấy sản phẩm nào!</p>";
+}
+?>
+
                 </div>
+
 
             </div>
 

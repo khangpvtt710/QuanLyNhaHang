@@ -59,4 +59,12 @@ class Database {
             $this->link->close();
         }
     }
+
+    public function escape($value) {
+    return mysqli_real_escape_string($this->link, $value);
+    }
+
+    public function getLink() {
+        return $this->link;
+    }
 }

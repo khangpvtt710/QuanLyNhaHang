@@ -19,6 +19,7 @@
 session_start();
 include "class/cartegory-class.php";
 include "class/brand-class.php";
+
 ?>
 <?php
 $cartegory = new cartegoryclass;
@@ -78,11 +79,43 @@ $show_cartegory = $cartegory->show_cartegory();
 
 
         <div class="others">
-            <li><input placeholder="Tìm Kiếm" type="text"> <img src="img/search.png"> </li>
-            <li><a class="fa fa-paw" href=""></a></li>
-            <li><a class="fa fa-user" href=""></a></li>
-            <li><a class="fa fa-shopping-bag" href=""></a></li>
+
+            <li><input placeholder="Tìm Kiếm" type="text"> <img src="img/search.png"></li>
+            <li><a class="fa fa-home" href="index.php"></a></li>
+            <li><a class="fa fa-shopping-bag" href="cartmain.php"></a></li>
+
+            <?php if (isset($_SESSION['user_login'])): ?>
+
+            <!-- HIỂN THỊ TÊN USER -->
+            <li style="color:#ff7a00; font-weight:bold;">
+                👤 <?php echo $_SESSION['user_login']; ?>
+            </li>
+
+            <!-- NÚT QUẢN LÝ CHỈ DÀNH CHO ADMIN -->
+            <?php if ($_SESSION['user_login'] === 'admin'): ?>
+            <li>
+                <a href="admin/index.php" class="login-btn">Quản lý</a>
+            </li>
+            <?php endif; ?>
+
+            <!-- ĐĂNG XUẤT -->
+            <li>
+                <a href="logout.php" class="login-btn" style="background:#555;">Đăng xuất</a>
+            </li>
+
+            <?php else: ?>
+
+            <!-- CHƯA ĐĂNG NHẬP -->
+            <li>
+                <button class="login-btn" onclick="window.location.href='login.php'">
+                    Đăng nhập
+                </button>
+            </li>
+
+            <?php endif; ?>
+
         </div>
+
         <div>
             <style>
             .login-btn {
@@ -108,8 +141,6 @@ $show_cartegory = $cartegory->show_cartegory();
             }
             </style>
 
-            <button class="login-btn" onclick="window.location.href='login.php'">
-                Đăng Nhập
-            </button>
+
         </div>
     </header>

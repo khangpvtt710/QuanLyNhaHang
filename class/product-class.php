@@ -28,12 +28,12 @@ class productclass {
     //     INSERT PRODUCT (NO IMG DESC)
     // ================================
     public function insert_product($data, $files){
-        $product_name = $this->db->link->real_escape_string($data['product_name']);
-        $cartegory_id = $this->db->link->real_escape_string($data['cartegory_id']);
-        $brand_id = $this->db->link->real_escape_string($data['brand_id']);
-        $product_price = $this->db->link->real_escape_string($data['product_price']);
-        $product_sale = $this->db->link->real_escape_string($data['product_sale']);
-        $product_desc = $this->db->link->real_escape_string($data['product_desc']);
+        $product_name = $this->db->escape($data['product_name']);
+        $cartegory_id = $this->db->escape($data['cartegory_id']);
+        $brand_id = $this->db->escape($data['brand_id']);
+        $product_price = $this->db->escape($data['product_price']);
+        $product_sale = $this->db->escape($data['product_sale']);
+        $product_desc = $this->db->escape($data['product_desc']);
 
         // ---------- ẢNH ĐẠI DIỆN ----------
         $product_img_name = $files['product_img']['name'];
@@ -99,26 +99,26 @@ class productclass {
     }
 
     public function show_brand_ajax($cartegory_id){
-        $id = $this->db->link->real_escape_string($cartegory_id);
+        $id = $this->db->escape($cartegory_id);
         $query = "SELECT * FROM tbl_brand WHERE cartegory_id = '$id' ORDER BY brand_id DESC";
         return $this->db->select($query);
     }
 
     public function show_products_by_cartegory($cartegory_id){
-        $id = $this->db->link->real_escape_string($cartegory_id);
+        $id = $this->db->escape($cartegory_id);
         $query = "SELECT * FROM tbl_product WHERE cartegory_id = '$id' ORDER BY product_id DESC";
         return $this->db->select($query);
     }
 
     public function get_cartegory($cartegory_id){
-        $id = $this->db->link->real_escape_string($cartegory_id);
+        $id = $this->db->escape($cartegory_id);
         $query = "SELECT * FROM tbl_cartegory WHERE cartegory_id = '$id'";
         return $this->db->select($query);
     }
 
     public function update_cartegory($cartegory_name, $cartegory_id){
-        $name = $this->db->link->real_escape_string($cartegory_name);
-        $id = $this->db->link->real_escape_string($cartegory_id);
+        $name = $this->db->escape($cartegory_name);
+        $id = $this->db->escape($cartegory_id);
         $query = "UPDATE tbl_cartegory SET cartegory_name = '$name' WHERE cartegory_id = '$id'";
         return $this->db->update($query);
     }
@@ -135,7 +135,7 @@ class productclass {
 }
 
     public function delete_cartegory($cartegory_id){
-        $id = $this->db->link->real_escape_string($cartegory_id);
+        $id = $this->db->escape($cartegory_id);
         $query = "DELETE FROM tbl_cartegory WHERE cartegory_id = '$id'";
         return $this->db->delete($query);
     }
@@ -154,5 +154,52 @@ class productclass {
         $query = "SELECT * FROM tbl_product WHERE brand_id = '$brand_id'";
         return $this->db->select($query);
     }
+
+    public function get_product_by_id($product_id)
+    {
+        $query = "
+            SELECT p.*, c.cartegory_name, b.brand_name
+            FROM tbl_product p
+            JOIN tbl_cartegory c ON p.cartegory_id = c.cartegory_id
+            JOIN tbl_brand b ON p.brand_id = b.brand_id
+            WHERE p.product_id = '$product_id'
+            LIMIT 1
+        ";
+
+        return $this->db->select($query);
+    }
+
+
+    public function get_products_by_cartegory($cartegory_id)
+{
+    $query = "
+        SELECT *
+        FROM tbl_product
+        WHERE cartegory_id = '$cartegory_id'
+        ORDER BY product_id DESC
+    ";
+
+    return $this->db->select($query);
+}
+
+    public function get_product_by_cartegory($cartegory_id){
+    $id = $this->db->escape($cartegory_id);
+    $query = "SELECT * FROM tbl_product WHERE cartegory_id = '$id' ORDER BY product_id DESC";
+    return $this->db->select($query);
+}
+public function show_product(){
+    $query = "
+        SELECT p.*, c.cartegory_name, b.brand_name
+        FROM tbl_product AS p
+        INNER JOIN tbl_cartegory AS c 
+            ON p.cartegory_id = c.cartegory_id
+        INNER JOIN tbl_brand AS b 
+            ON p.brand_id = b.brand_id
+        ORDER BY p.product_id DESC
+    ";
+    return $this->db->select($query);
+}
+
+
 }
 ?>

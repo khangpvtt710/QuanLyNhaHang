@@ -1,98 +1,143 @@
 <?php
-include "headermain.php"
+include "headermain.php";
+
+// ==========================
+// 1. NHẬN THÔNG TIN TỪ DELIVERY
+// ==========================
+if ($_SERVER['REQUEST_METHOD'] == "POST") {
+    $_SESSION['shipping'] = [
+        "fullname" => $_POST['fullname'],
+        "phone" => $_POST['phone'],
+        "city" => $_POST['city'],
+        "district" => $_POST['district'],
+        "address" => $_POST['address']
+    ];
+}
+
+// ==========================
+// 2. LẤY GIỎ HÀNG
+// ==========================
+$cart = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
+
+// ==========================
+// 3. TÍNH TIỀN
+// ==========================
+$total = 0;
+foreach ($cart as $item){
+    $total += $item['price'] * $item['quantity'];
+}
+$vat = $total * 0.1;
+$grand_total = $total + $vat;
 ?>
+
 <!---------------------------Payment------------------------------------------------->
 <section class="payment brick">
     <div class="container">
-        <div class="payment-top-swap">
-            <div class="payment-top">
-                <div class="payment-top-payment payment-top-item">
-                    <a href="cartmain.php"><i class="fas fa-shopping-cart "></i></a>
-                </div>
-                <div class="payment-top-adress payment-top-item">
-                    <a href="deliverymain.php"><i class="fas fa-map-marker-alt"></i></a>
-                </div>
-                <div class="payment-top-payments payment-top-item">
-                    <a href="paymentmain.php"><i class="fas fa-money-check-alt "></i></a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="container">
+
+        <h2 style="margin: 10px 0;">Thanh toán đơn hàng</h2>
+
         <div class="payment-content row">
+
+            <!-- ========== TRÁI: PHƯƠNG THỨC THANH TOÁN ========= -->
             <div class="payment-content-left">
-                <div class="payment-content-left-method-delivery">
-                    <p style="font-weight: bold; font-size: 20px;">Phương Thức Giao Hàng</p>
-                    <div class="payment-content-left-method-delivery-item">
-                        <input type="radio" checked>
-                        <label for="" style="font-size: 15px">Giao hàng chuyển phát nhanh</label>
+
+                <form action="order_success.php" method="POST">
+
+                    <div class="payment-content-left-method-delivery">
+                        <p style="font-weight:bold;font-size:18px;">Thông tin giao hàng</p>
+
+                        <?php if(isset($_SESSION['shipping'])): ?>
+                        <p><b>Họ tên:</b> <?= $_SESSION['shipping']['fullname'] ?></p>
+                        <p><b>SĐT:</b> <?= $_SESSION['shipping']['phone'] ?></p>
+                        <p><b>Địa chỉ:</b>
+                            <?= $_SESSION['shipping']['address'] ?>,
+                            <?= $_SESSION['shipping']['district'] ?>,
+                            <?= $_SESSION['shipping']['city'] ?>
+                        </p>
+                        <?php else: ?>
+                        <p style="color:red;">⚠ Bạn chưa nhập địa chỉ</p>
+                        <?php endif; ?>
                     </div>
-                </div>
-                <div class="payment-content-left-method-payment">
-                    <p style="font-weight: bold;">Phương Thức Thanh Toán</p>
-                    <p>Mọi giao dịch đều được bảo mật và mã hóa.</p>
-                    <div class="payment-content-left-method-payment-item">
-                        <input name="method-payment" type="radio">
-                        <label for="">Thanh tóan qua thẻ tín dụng </label>
-                    </div>
-                    <div class="payment-content-left-method-payment-item-img1">
-                        <img src="img/visa.jpg" alt="">
-                    </div>
-                    <div class="payment-content-left-method-payment-item">
-                        <input name="method-payment" type="radio" checked>
-                        <label for="">Thanh tóa qua thẻ ATM </label>
-                    </div>
-                    <div class="payment-content-left-method-payment-item-img2">
-                        <img src="img/atm.png" alt="">
-                    </div>
-                    <div class="payment-content-left-method-payment-item">
-                        <input name="method-payment" type="radio">
-                        <label for="">Thanh tóan qua MoMo </label>
-                    </div>
-                    <div class="payment-content-left-method-payment-item-img3">
-                        <img src="img/momo.jpg" alt="">
-                    </div>
-                    <div class="payment-content-left-method-payment-item">
-                        <input name="method-payment" type="radio">
-                        <label for="">Thanh tóan khi giao hàng </label>
-                    </div>
-                </div>
+
+                    <hr>
+
+                    <p style="font-weight:bold;">Chọn phương thức thanh toán</p>
+
+                    <label>
+                        <input type="radio" name="payment_method" value="COD" checked>
+                        Thanh toán khi nhận hàng (COD)
+                    </label><br>
+
+                    <label>
+                        <input type="radio" name="payment_method" value="ATM">
+                        Thẻ ATM / Internet Banking
+                    </label><br>
+
+                    <label>
+                        <input type="radio" name="payment_method" value="MOMO">
+                        Ví MoMo
+                    </label><br>
+
+                    <label>
+                        <input type="radio" name="payment_method" value="VISA">
+                        Thẻ Visa / Mastercard
+                    </label><br>
+
+                    <br>
+
+                    <button type="submit"
+                        style="padding:12px 25px;background:orangered;color:white;border:none;border-radius:6px;cursor:pointer;">
+                        XÁC NHẬN THANH TOÁN
+                    </button>
+
+                </form>
+
             </div>
+
+            <!-- ========== PHẢI: HÓA ĐƠN ========= -->
             <div class="payment-content-right">
-                <div class="payment-content-right-button">
-                    <input type="text" placeholder="Mã Giảm Giá/Quà Tặng">
-                    <button><i class="fas fa-check"></i></button>
-                </div>
-                <div class="payment-content-right-button">
-                    <input type="text" placeholder="Mã Cộng Tác Viên">
-                    <button><i class="fas fa-check"></i></button>
-                </div>
-                <div class="payment-content-right-mnv">
-                    <select name="" id="">
-                        <option value="">Chọn mã nhân viên thân thiết</option>
-                        <option value="">TG237</option>
-                        <option value="">TG227</option>
-                        <option value="">TG127</option>
-                        <option value="">TG233</option>
-                    </select>
-                </div>
+                <table border="1" width="100%" cellpadding="5">
+
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th>SL</th>
+                        <th>Thành tiền</th>
+                    </tr>
+
+                    <?php if($cart): foreach($cart as $item): ?>
+                    <tr>
+                        <td><?= $item['name'] ?></td>
+                        <td><?= $item['quantity'] ?></td>
+                        <td><?= number_format($item['price'] * $item['quantity']) ?> đ</td>
+                    </tr>
+                    <?php endforeach; else: ?>
+                    <tr>
+                        <td colspan="3" style="text-align:center;">🛒 Giỏ hàng trống</td>
+                    </tr>
+                    <?php endif; ?>
+
+                    <tr>
+                        <td colspan="2"><b>Tạm tính</b></td>
+                        <td><b><?= number_format($total) ?> đ</b></td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="2"><b>VAT 10%</b></td>
+                        <td><b><?= number_format($vat) ?> đ</b></td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="2"><b>Tổng thanh toán</b></td>
+                        <td style="color:red;font-size:18px;">
+                            <b><?= number_format($grand_total) ?> đ</b>
+                        </td>
+                    </tr>
+
+                </table>
             </div>
-        </div>
-        <div class="payment-content-right-payment">
-            <button>
-                Tiếp Tục Thanh Toán
-            </button>
-            <br><br><br>
+
         </div>
     </div>
 </section>
 
-
-<!---------------------------------------------------------------------------->
-<?php
-include "footermain.php"
-?>
-</body>
-<script src="js/index.js"></script>
-
-</html>
+<?php include "footermain.php"; ?>
